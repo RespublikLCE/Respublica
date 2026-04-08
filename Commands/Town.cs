@@ -18,7 +18,7 @@ public class TownCmd : CommandExecutor
                         	return true;
                 	}
 			sender.sendMessage($"---{Town.formatName(t.name)}---");
-			sender.sendMessage($"Mayor: {t.mayorName}");
+			sender.sendMessage($"Mayor: {Plr.guidToUsrname(t.mayor)}");
 			sender.sendMessage($"PLACE: {t.DEFAULT_PLACE_PERM} BREAK: {t.DEFAULT_BREAK_PERM} FIRE: {t.DEFAULT_FIRE_PERM} MOBS: {t.DEFAULT_MOB_PERM}");
 			return true;
 		}
@@ -51,6 +51,8 @@ public class TownCmd : CommandExecutor
                         break;
                 	}
 
+					if (t.mayor != ((Player)sender).getUniqueId()) { sender.sendMessage("You do not have permission to use this command."); break; }
+
 					switch (args[1]) // sub-sub command
 					{
 						case "name":
@@ -58,6 +60,15 @@ public class TownCmd : CommandExecutor
 							t.name = args[2];
 							DBInteract.updateTown(t, newname);
 							sender.sendMessage($"Changed town name to \"{Town.formatName(args[2])}\"");
+							break;
+						case "mayor":
+							if (!t.residents.Exists(x => x == Plr.usrToGuid(args[2]))) break;
+							var newmayor = Plr.usrToGuid(args[2]);
+
+							var newt = (MCTown)t;
+							t.mayor = newmayor;
+							DBInteract.updateTown(t, newt);
+							sender.sendMessage($"Resigned mayor position to {newmayor}");
 							break;
 					}
 

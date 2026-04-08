@@ -9,7 +9,6 @@ public class MCTown {
         public bool DEFAULT_BREAK_PERM { get; set; } = false;
         public bool DEFAULT_PLACE_PERM { get; set; } = false;
         public bool DEFAULT_MOB_PERM { get; set; } = false; // TODO: make these perms configurable in the future
-	public string mayorName { get; set; } = "";
         public Guid mayor { get; set; } = Guid.Empty;
         public List<Guid> residents { get; set; } = new List<Guid>();
 	public MCChunk homeChunk { get; set; } = Chunk.initChunk(0, 0, ""); // blank nothing chunk
@@ -39,10 +38,9 @@ public static partial class DBInteract {
 		var newc = Chunk.initChunk(ccoord.x, ccoord.z, name);
        		var newtown = new DBTown
         	{
-            		name = name,
-			mayorName = mayor.getName(),
-            		mayor = mayor.getUniqueId(),
-			homeChunk = newc
+            	name = name,
+            	mayor = mayor.getUniqueId(),
+				homeChunk = newc
         	};
         	newtown.residents.Add(mayor.getUniqueId());
 		
@@ -59,7 +57,7 @@ public static partial class DBInteract {
 	}
 	public static void updateTown(DBTown town, MCTown newtown) {
 		var col = Database.Instance.GetCollection<DBTown>("towns");
-		if (!col.Exists(x => x == town)) {
+		if (!col.Exists(x => x.id == town.id)) {
 			Console.WriteLine("[RESPUBLICA] Tried to modify non-existent town!");
 			return;
 		}
@@ -70,7 +68,6 @@ public static partial class DBInteract {
 			DEFAULT_BREAK_PERM = newtown.DEFAULT_BREAK_PERM,
 			DEFAULT_PLACE_PERM = newtown.DEFAULT_PLACE_PERM,
 			DEFAULT_MOB_PERM = newtown.DEFAULT_MOB_PERM,
-			mayorName = newtown.mayorName,
 			mayor = newtown.mayor,
 			residents = newtown.residents,
 			homeChunk = newtown.homeChunk

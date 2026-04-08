@@ -19,6 +19,14 @@ public class RespublicaListener : Listener
 		return "";
 	}
 
+	[EventHandler]
+	public void onJoin(PlayerJoinEvent e)
+	{
+		if (!DBInteract.isPlrReal(e.getPlayer().getUniqueId())) DBInteract.initPlr(e.getPlayer());
+
+		DBInteract.updatePlr(e.getPlayer().getUniqueId(), e.getPlayer().getName()); // UNI - no reason not to always do ig? would just be annoying to constantly check if the usrname is different
+	}
+
 	// interactions
 	[EventHandler]
 	public void onInteract(PlayerInteractEvent e)
