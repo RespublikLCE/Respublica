@@ -69,7 +69,7 @@ public static class Chunk {
 		}
 		var near = nearChunks(chunk);
 		foreach (DBChunk nearchunk in near) {
-			if (nearchunk.town == chunk.town) return availabilityEnum.AVAILABLE;
+			if (nearchunk.town == tcheck) return availabilityEnum.AVAILABLE;
 		}
 		return availabilityEnum.NOT_NEAR;
 	}

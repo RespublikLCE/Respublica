@@ -18,6 +18,7 @@ public class TownCmd : CommandExecutor
                         	return true;
                 	}
 			sender.sendMessage($"---{Town.formatName(t.name)}---");
+			sender.sendMessage($"Chunk count: {Database.Instance.GetCollection<DBChunk>("chunks").Count(LiteDB.Query.EQ("town", t.name))}"); // UNI - srry didn't feel like adding a function
 			sender.sendMessage($"Mayor: {Plr.guidToUsrname(t.mayor)}");
 			sender.sendMessage($"PLACE: {t.DEFAULT_PLACE_PERM} BREAK: {t.DEFAULT_BREAK_PERM} FIRE: {t.DEFAULT_FIRE_PERM} MOBS: {t.DEFAULT_MOB_PERM}");
 			return true;
@@ -43,8 +44,7 @@ public class TownCmd : CommandExecutor
 					sender.sendMessage($"Created town \"{Town.formatName(args[1])}\"!");
 					break;
 				case "set":
-					if (args.Length < 3) { sender.sendMessage("Invalid set command."); break; }
-					
+					if (args.Length < 2) { sender.sendMessage("Invalid set command."); break; }
 					if (string.IsNullOrEmpty(t.name)) {
                         sender.sendMessage("You don't have a town!");
 //						Console.WriteLine("bro dont had a town");
@@ -56,12 +56,14 @@ public class TownCmd : CommandExecutor
 					switch (args[1]) // sub-sub command
 					{
 						case "name":
+							if (args.Length < 3) { sender.sendMessage("Invalid set command."); break; }
 							var newname = (MCTown)t;
 							t.name = args[2];
 							DBInteract.updateTown(t, newname);
 							sender.sendMessage($"Changed town name to \"{Town.formatName(args[2])}\"");
 							break;
 						case "mayor":
+							if (args.Length < 3) { sender.sendMessage("Invalid set command."); break; }
 							if (!t.residents.Exists(x => x == Plr.usrToGuid(args[2]))) break;
 							var newmayor = Plr.usrToGuid(args[2]);
 
@@ -70,8 +72,53 @@ public class TownCmd : CommandExecutor
 							DBInteract.updateTown(t, newt);
 							sender.sendMessage($"Resigned mayor position to {newmayor}");
 							break;
+						case "homeblock":
+							var newhome = (MCTown)t;
+							var newcoord = Chunk.cToCC(((Player)sender).getLocation());
+							var newchunk = Chunk.getChunk(newcoord.x, newcoord.z);
+							if (newchunk == null)
+							{
+								sender.sendMessage("Chunk is not available.");
+								break;
+							}
+							t.homeChunk = newchunk;
+							DBInteract.updateTown(t, newhome);
+							sender.sendMessage($"Changed home chunk to {{{newcoord.x}, {newcoord.z}}}.");
+							break;
 					}
 
+					break;
+				case "claim":
+					if (string.IsNullOrEmpty(t.name)) {
+                        sender.sendMessage("You don't have a town!");
+//						Console.WriteLine("bro dont had a town");
+                        break;
+                	}
+
+					if (t.mayor != ((Player)sender).getUniqueId()) { sender.sendMessage("You do not have permission to use this command."); break; }
+
+					var newcoord2 = Chunk.cToCC(((Player)sender).getLocation());
+					var newclaim = Chunk.initChunk(newcoord2.x, newcoord2.z, t.name); // UNI - to put a little less on the db
+					var available = Chunk.chunkAvailable(newclaim);
+					if (available != availabilityEnum.AVAILABLE)
+					{
+						switch (available)
+						{
+							case availabilityEnum.SELF_CLAIMED:
+								sender.sendMessage("You already own this chunk!");
+								break;
+							case availabilityEnum.EX_CLAIMED:
+								sender.sendMessage("Someone already owns this chunk!");
+								break;
+							case availabilityEnum.NOT_NEAR:
+								sender.sendMessage("Chunk is not on border!");
+								break;
+						}
+						break;
+					}
+
+					DBInteract.createChunk(newclaim);
+					sender.sendMessage($"Claimed chunk {{{newcoord2.x}, {newcoord2.z}}}");
 					break;
 			}
 		}
