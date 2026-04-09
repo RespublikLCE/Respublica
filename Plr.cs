@@ -6,6 +6,10 @@ public class MCPlr
 {
     public string name { get; set; } = "";
     public Guid uid { get; set; } = Guid.Empty;
+    public bool DEFAULT_FIRE_PERM { get; set; } = false;
+    public bool DEFAULT_BREAK_PERM { get; set; } = false;
+    public bool DEFAULT_PLACE_PERM { get; set; } = false;
+    public bool DEFAULT_MOB_PERM { get; set; } = false; // TODO: make these perms configurable in the future
 }
 
 public class DBPlr : MCPlr
