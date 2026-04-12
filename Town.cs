@@ -26,11 +26,11 @@ public static class Town
 public static partial class DBInteract {
 	public static void initTown(Player mayor, string name) {
 		var col = Database.Instance.GetCollection<DBTown>("towns");
-		if (col.Exists(LiteDB.Query.EQ("name", name))) {
+		if (col.FindOne(LiteDB.Query.EQ("name", name)) != null) {
 			Console.WriteLine("[RESPUBLICA] Tried to initialize town that already exists!");
 			return;
 		}
-		if (col.Exists(LiteDB.Query.EQ("mayor", mayor.getUniqueId()))) {
+		if (col.FindOne(LiteDB.Query.EQ("mayor", mayor.getUniqueId())) != null) {
 			Console.WriteLine("[RESPUBLICA] Mayor already has a town!");
 			return;
 		}
@@ -49,7 +49,7 @@ public static partial class DBInteract {
 	}
 	public static void remTown(DBTown town) {
 		var col = Database.Instance.GetCollection<DBTown>("towns");
-		if (!col.Exists(x => x == town)) { // UNI - i have no idea if this is gonna work
+		if (col.FindOne(x => x == town) == null) { // UNI - i have no idea if this is gonna work
 			Console.WriteLine("[RESPUBLICA] Tried to delete non-existent town!");
 			return;
 		}
@@ -57,7 +57,7 @@ public static partial class DBInteract {
 	}
 	public static void updateTown(DBTown town, MCTown newtown) {
 		var col = Database.Instance.GetCollection<DBTown>("towns");
-		if (!col.Exists(x => x.id == town.id)) {
+		if (col.FindOne(x => x.id == town.id) == null) {
 			Console.WriteLine("[RESPUBLICA] Tried to modify non-existent town!");
 			return;
 		}
@@ -76,7 +76,7 @@ public static partial class DBInteract {
 	public static DBTown getTown(string name)
 	{
 		var col = Database.Instance.GetCollection<DBTown>("towns");
-		if (!col.Exists(LiteDB.Query.EQ("name", name)))
+		if (col.FindOne(LiteDB.Query.EQ("name", name)) == null)
 		{
 			Console.WriteLine("[RESPUBLICA] Tried to get non-existent town!");
 			return new DBTown();

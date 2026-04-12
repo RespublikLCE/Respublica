@@ -6,6 +6,7 @@ public class MCPlr
 {
     public string name { get; set; } = "";
     public Guid uid { get; set; } = Guid.Empty;
+    public string town { get; set; } = "";
     public bool DEFAULT_FIRE_PERM { get; set; } = false;
     public bool DEFAULT_BREAK_PERM { get; set; } = false;
     public bool DEFAULT_PLACE_PERM { get; set; } = false;
@@ -54,7 +55,7 @@ public static partial class DBInteract
     {
         var col = Database.Instance.GetCollection<DBPlr>("plr");
 
-        if (col.Exists(x => x == new MCPlr { name = name, uid = uid }))
+        if (isPlrReal(uid))
         {
             Console.WriteLine("[RESPUBLICA] User already exists!");
             return;
@@ -66,13 +67,15 @@ public static partial class DBInteract
             uid = uid
         };
 
+        Console.WriteLine($"[RESPUBLICA] Created new user {name} of uid {uid}");
+
         col.Insert(plr);
     }
     public static void initPlr(Player plr)
     {
         var col = Database.Instance.GetCollection<DBPlr>("plr");
 
-        if (col.Exists(x => x == new MCPlr { name = plr.getName(), uid = plr.getUniqueId() }))
+        if (isPlrReal(plr.getUniqueId()))
         {
             Console.WriteLine("[RESPUBLICA] User already exists!");
             return;
@@ -84,13 +87,15 @@ public static partial class DBInteract
             uid = plr.getUniqueId()
         };
 
+        Console.WriteLine($"[RESPUBLICA] Created new user {plr.getName()} of uid {plr.getUniqueId()}");
+
         col.Insert(dbplr);
     }
     public static void updatePlr(Guid uid, string name)
     {
         var col = Database.Instance.GetCollection<DBPlr>("plr");
 
-        if (!col.Exists(LiteDB.Query.EQ("uid", uid)))
+        if (!isPlrReal(uid))
         {
             Console.WriteLine("[RESPUBLICA] User doesn't exist!");
             return;
@@ -101,5 +106,5 @@ public static partial class DBInteract
 
         col.Update(newplr);
     }
-    public static bool isPlrReal(Guid uid) => Database.Instance.GetCollection<DBPlr>("plr").Exists(LiteDB.Query.EQ("uid", uid));
+    public static bool isPlrReal(Guid uid) => Database.Instance.GetCollection<DBPlr>("plr").FindOne(LiteDB.Query.EQ("uid", uid)) != null;
 }

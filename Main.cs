@@ -2,6 +2,7 @@
 
 using Minecraft.Server.FourKit.Plugin;
 using Commands;
+using Minecraft.Server.FourKit;
 
 public class Respublica : ServerPlugin
 {
@@ -18,6 +19,8 @@ public class Respublica : ServerPlugin
 	public override void onEnable() {
 //		_instance = this;
 		Init.InitCmd();
+
+		FourKit.addListener(new RespublicaListener());
 	}
 
     public override void onDisable()

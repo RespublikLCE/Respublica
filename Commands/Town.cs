@@ -58,7 +58,7 @@ public class TownCmd : CommandExecutor
 						case "name":
 							if (args.Length < 3) { sender.sendMessage("Invalid set command."); break; }
 							var newname = (MCTown)t;
-							t.name = args[2];
+							newname.name = args[2];
 							DBInteract.updateTown(t, newname);
 							sender.sendMessage($"Changed town name to \"{Town.formatName(args[2])}\"");
 							break;
@@ -68,7 +68,7 @@ public class TownCmd : CommandExecutor
 							var newmayor = Plr.usrToGuid(args[2]);
 
 							var newt = (MCTown)t;
-							t.mayor = newmayor;
+							newt.mayor = newmayor;
 							DBInteract.updateTown(t, newt);
 							sender.sendMessage($"Resigned mayor position to {newmayor}");
 							break;
@@ -81,7 +81,7 @@ public class TownCmd : CommandExecutor
 								sender.sendMessage("Chunk is not available.");
 								break;
 							}
-							t.homeChunk = newchunk;
+							newhome.homeChunk = newchunk;
 							DBInteract.updateTown(t, newhome);
 							sender.sendMessage($"Changed home chunk to {{{newcoord.x}, {newcoord.z}}}.");
 							break;
@@ -119,6 +119,29 @@ public class TownCmd : CommandExecutor
 
 					DBInteract.createChunk(newclaim);
 					sender.sendMessage($"Claimed chunk {{{newcoord2.x}, {newcoord2.z}}}");
+					break;
+				case "invite":
+					if (args.Length < 2) { sender.sendMessage("Invalid invite command."); break; }
+
+					if (string.IsNullOrEmpty(t.name)) {
+                        sender.sendMessage("You don't have a town!");
+//						Console.WriteLine("bro dont had a town");
+                        break;
+                	}
+
+					switch (args[1])
+					{
+						case "add":
+							if (args.Length < 3) { sender.sendMessage("Invalid invite command."); break; }
+							if (t.residents.Exists(x => x == Plr.usrToGuid(args[2]))) break;
+							var newjoin = Plr.usrToGuid(args[2]);
+							var newj = (MCTown)t;
+							newj.residents.Add(newjoin); // UNI - temp
+							DBInteract.updateTown(t, newj);
+							sender.sendMessage($"Invited {newjoin} to the town.");
+							break;
+					}
+
 					break;
 			}
 		}
