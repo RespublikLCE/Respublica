@@ -13,10 +13,7 @@ public class MCPlr // Class for players and for default plot permissions
     public string name { get; set; } = "";
     public Guid uid { get; set; } = Guid.Empty;
     public LiteDB.ObjectId town { get; set; } = LiteDB.ObjectId.Empty;
-    public bool DEFAULT_FIRE_PERM { get; set; } = false;
-    public bool DEFAULT_BREAK_PERM { get; set; } = false;
-    public bool DEFAULT_PLACE_PERM { get; set; } = false;
-    public bool DEFAULT_MOB_PERM { get; set; } = false; // TODO: make these perms configurable in the future
+    public PlotPerm perm { get; set; } = new();
     public List<Invite> invites { get; set; } = [];
 }
 

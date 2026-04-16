@@ -1,0 +1,35 @@
+namespace Respublica.Commands;
+
+using Minecraft.Server.FourKit.Command;
+using Minecraft.Server.FourKit.Entity;
+
+public class PlotCmd : CommandExecutor // Commands for managing invites
+{
+    public bool onCommand(CommandSender sender, Command command, string label, string[] args)
+    {
+        if (sender is not Player) return true;
+
+        var pcoord = Chunk.cToCC(((Player)sender).getLocation());
+        var plot = DBInteract.getPlot(pcoord.x, pcoord.z) ?? new();
+        if (DBInteract.getTownById(plot.town) == new DBTown()) // UNI - for not showing how bad the plot code is
+        {
+            plot.perm.PVP = true; plot.perm.EXPLOSION = true; plot.perm.FIRE = true; plot.perm.MOBS = true;
+        }
+        else if (string.IsNullOrEmpty(Plr.guidToUsrname(plot.owner)))
+        {
+            var t = DBInteract.getTownById(plot.town);
+            plot.perm.PVP = t.perm.PVP; plot.perm.EXPLOSION = t.perm.EXPLOSION; plot.perm.FIRE = t.perm.FIRE; plot.perm.MOBS = t.perm.MOBS;
+        }
+
+        if (args.Length == 0)
+        {
+            sender.sendMessage($"--- Plot ({pcoord.x}, {pcoord.z}) ---");
+            var tname = DBInteract.getTownById(plot.town).name;
+            sender.sendMessage(string.Format("Town: {0}", string.IsNullOrEmpty(tname) ? "None" : Town.formatName(tname))); // UNI - don't question the string.Format use
+            sender.sendMessage(string.Format("Owner: {0}", string.IsNullOrEmpty(Plr.guidToUsrname(plot.owner)) ? "None" : Plr.guidToUsrname(plot.owner)));
+            sender.sendMessage($"PVP: {plot.perm.PVP} EXPLOSIONS: {plot.perm.EXPLOSION} FIRE: {plot.perm.FIRE} MOBS: {plot.perm.MOBS}");
+        }
+
+        return true;
+    }
+}

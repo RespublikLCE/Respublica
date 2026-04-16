@@ -11,7 +11,7 @@ public class InvCmd : CommandExecutor // Commands for managing invites
 
         if (args.Length == 0)
         {
-            sender.sendMessage("Town invites:");
+            sender.sendMessage("--- Town invites ---");
             foreach (var al0town in DBInteract.getPlr(((Player)sender).getUniqueId()).invites) sender.sendMessage(DBInteract.getTownById(al0town.id).name);
             sender.sendMessage("Do /invite accept [name] to join a town!");
         }

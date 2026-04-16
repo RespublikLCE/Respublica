@@ -5,10 +5,7 @@ using Minecraft.Server.FourKit.Entity;
 public class MCTown { // Class for non-DB towns
 	public string name { get; set; } = "";
 //  public int bal; // TODO: implement once eco plugins become a thing with apis n shit
-    public bool DEFAULT_FIRE_PERM { get; set; } = false;
-    public bool DEFAULT_PVP_PERM { get; set; } = false;
-    public bool DEFAULT_EXPLOSION_PERM { get; set; } = false;
-    public bool DEFAULT_MOB_PERM { get; set; } = false; // TODO: make these perms configurable in the future
+    public PlotPerm perm { get; set; } = new();
     public Guid mayor { get; set; } = Guid.Empty;
     public List<Guid> residents { get; set; } = new List<Guid>();
 	public MCChunk homeChunk { get; set; } = Chunk.initChunk(0, 0, LiteDB.ObjectId.Empty); // blank nothing chunk

@@ -17,10 +17,10 @@ public class TownCmd : CommandExecutor // Commands for managing towns
                         	sender.sendMessage("You don't have a town!");
                         	return true;
                 	}
-			sender.sendMessage($"---{Town.formatName(t.name)}---");
+			sender.sendMessage($"--- {Town.formatName(t.name)} ---");
 			sender.sendMessage($"Chunk count: {Database.Instance.GetCollection<DBChunk>("chunks").Count(LiteDB.Query.EQ("town", t.name))}"); // UNI - srry didn't feel like adding a function
 			sender.sendMessage($"Mayor: {Plr.guidToUsrname(t.mayor)}");
-			sender.sendMessage($"PVP: {t.DEFAULT_PVP_PERM} EXPLOSIONS: {t.DEFAULT_EXPLOSION_PERM} FIRE: {t.DEFAULT_FIRE_PERM} MOBS: {t.DEFAULT_MOB_PERM}");
+			sender.sendMessage($"PVP: {t.perm.PVP} EXPLOSIONS: {t.perm.EXPLOSION} FIRE: {t.perm.FIRE} MOBS: {t.perm.MOBS}");
 			return true;
 		}
 
