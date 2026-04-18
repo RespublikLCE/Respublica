@@ -4,11 +4,19 @@
 name: Nightly Build
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch:
+  
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: nightly
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -16,9 +24,9 @@ jobs:
     runs-on: windows-latest # Just in case a .dll builds better/easier for windows
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '10.0.201'
     - name: Restore dependencies
@@ -27,3 +35,52 @@ jobs:
       run: dotnet build ./src/Respublica.csproj --no-restore
     - name: Test
       run: dotnet test ./src/Respublica.csproj --no-build --verbosity normal
+    - name: Zip Build
+      run: 7z a -r Respublica.zip ./src/bin/Debug/net10.0/* "-x!*.pdb" "-x!Respublica.deps.json" "-x!Minecraft.Server.FourKit.dll"
+    - name: Stage artifacts
+      run: |
+        New-Item -ItemType Directory -Force -Path staging
+        Copy-Item Respublica.zip staging/
+    - name: Stage DLL
+      run: |
+        Copy-Item @(
+          "./src/bin/Debug/net10.0/Respublica.dll"
+        } staging/
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v6
+      with:
+        name: build-nightly
+        path: staging/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v7
+      with:
+        path: artifacts
+        marge-multiple: true
+    - name: Update nightly release
+      uses: andelf/nightly-release@main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: nightly
+        name: Nightly Release (Unstable)
+        body: |
+          Nightly release for Respublica!
+
+          To download, make sure your server is a FourKit server (more info in README.md) and extract the `Respublica.zip` file into an empty folder in ./plugins named 'Respublica'.
+        files: |
+          artifacts/*
+  cleanup:
+    needs: [build, release]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Cleanup artifacts
+      uses: geekyeggo/delete-artifact@v5
+      with:
+        name: nightly
