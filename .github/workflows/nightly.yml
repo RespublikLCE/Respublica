@@ -45,7 +45,7 @@ jobs:
       run: |
         Copy-Item @(
           "./src/bin/Debug/net10.0/Respublica.dll"
-        } staging/
+        ) staging/
     - name: Upload artifacts
       uses: actions/upload-artifact@v6
       with:
