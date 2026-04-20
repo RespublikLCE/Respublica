@@ -79,7 +79,7 @@ public class RespublicaListener : Listener
 
 		if (c1?.town != c2?.town && c2?.town != LiteDB.ObjectId.Empty && c2 != null)
 		{
-			e.getPlayer().sendMessage($"Entering {c2.town}!");
+			e.getPlayer().sendMessage($"Entering {DBInteract.getTownById(c2.town).name}!");
 		}
 		if (c2 == null && c2?.town == LiteDB.ObjectId.Empty && c1 != null && c1.town != LiteDB.ObjectId.Empty)
 		{
