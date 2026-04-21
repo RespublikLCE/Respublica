@@ -77,22 +77,23 @@ public class RespublicaListener : Listener
 		var c1 = Chunk.getChunk(cloc1.x, cloc1.z);
 		var c2 = Chunk.getChunk(cloc2.x, cloc2.z);
 
-		if (c1?.town != c2?.town && c2?.town != LiteDB.ObjectId.Empty && c2 != null)
+		if (c2 != null && c2.town != LiteDB.ObjectId.Empty && c1?.town != c2.town)
 		{
 			e.getPlayer().sendMessage($"Entering {DBInteract.getTownById(c2.town).name}!");
 		}
-		if (c2 == null && c2?.town == LiteDB.ObjectId.Empty && c1 != null && c1.town != LiteDB.ObjectId.Empty)
+		if (c1 != null && c1.town != LiteDB.ObjectId.Empty && (c2 == null || c2?.town == LiteDB.ObjectId.Empty))
 		{
 			e.getPlayer().sendMessage("Entering the wild!");
 		}
 	}
+	// UNI - Improved if-statements using Claude Sonnet 4.6
 
 	// interactions
 	[EventHandler]
 	public void onInteract(PlayerInteractEvent e)
 	{
 		if (e.getAction() != Minecraft.Server.FourKit.Block.Action.RIGHT_CLICK_BLOCK) return;
-		var cloc = Chunk.cToCC(e.getPlayer().getLocation());
+		var cloc = Chunk.cToCC(e.getClickedBlock().getLocation()); // UNI - don't worry abt this, its already guaranteed to be not-null
 		var chunk = Chunk.getChunk(cloc.x, cloc.z);
 		var town = DBInteract.getTownById(chunk?.town ?? LiteDB.ObjectId.Empty);
 
@@ -109,7 +110,7 @@ public class RespublicaListener : Listener
 	[EventHandler]
 	public void onInteractEntity(PlayerInteractEntityEvent e)
 	{
-		var cloc = Chunk.cToCC(e.getPlayer().getLocation());
+		var cloc = Chunk.cToCC(e.getRightClicked().getLocation());
 		var chunk = Chunk.getChunk(cloc.x, cloc.z);
 		var town = DBInteract.getTownById(chunk?.town ?? LiteDB.ObjectId.Empty);
 
@@ -129,7 +130,7 @@ public class RespublicaListener : Listener
 		var plr = e.getPlayer();
 		if (plr == null) return;
 
-		var cloc = Chunk.cToCC(plr.getLocation());
+		var cloc = Chunk.cToCC(e.getLocation());
 		var chunk = Chunk.getChunk(cloc.x, cloc.z);
 		var town = DBInteract.getTownById(chunk?.town ?? LiteDB.ObjectId.Empty);
 
@@ -147,7 +148,7 @@ public class RespublicaListener : Listener
 	[EventHandler]
 	public void onBreak(BlockBreakEvent e)
 	{
-		var cloc = Chunk.cToCC(e.getPlayer().getLocation());
+		var cloc = Chunk.cToCC(e.getBlock().getLocation());
 		var chunk = Chunk.getChunk(cloc.x, cloc.z);
 		var town = DBInteract.getTownById(chunk?.town ?? LiteDB.ObjectId.Empty);
 
@@ -164,7 +165,7 @@ public class RespublicaListener : Listener
 	[EventHandler]
 	public void onPlace(BlockPlaceEvent e)
 	{
-		var cloc = Chunk.cToCC(e.getPlayer().getLocation());
+		var cloc = Chunk.cToCC(e.getBlock().getLocation());
 		var chunk = Chunk.getChunk(cloc.x, cloc.z);
 		var town = DBInteract.getTownById(chunk?.town ?? LiteDB.ObjectId.Empty);
 

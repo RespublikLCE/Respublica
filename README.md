@@ -14,3 +14,8 @@ dotnet build
 ```
 ## API
 Coming soon!
+## AI Disclosure
+AI, specifically Claude Sonnet 4.6, was utilized for small bug fixes.
+
+Any usage of AI in PRs must be disclosed and commented within the code.
+Fully or majorly AI-generated PRs will be declined.
