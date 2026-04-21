@@ -56,7 +56,7 @@ public static partial class DBInteract { // DBInteract class partition for towns
 	}
 	public static void remTown(DBTown town) {
 		var col = Database.Instance.GetCollection<DBTown>("towns");
-		if (col.FindOne(x => x == town) == null) { // UNI - i have no idea if this is gonna work
+		if (col.FindById(town.id) == null) { // UNI - i have no idea if this is gonna work
 			Console.WriteLine("[RESPUBLICA] Tried to delete non-existent town!");
 			return;
 		}
@@ -64,7 +64,7 @@ public static partial class DBInteract { // DBInteract class partition for towns
 	}
 	public static void updateTown(DBTown town, MCTown newtown) {
 		var col = Database.Instance.GetCollection<DBTown>("towns");
-		if (col.FindOne(x => x.id == town.id) == null) {
+		if (col.FindById(town.id) == null) {
 			Console.WriteLine("[RESPUBLICA] Tried to modify non-existent town!");
 			return;
 		}
@@ -100,7 +100,7 @@ public static partial class DBInteract { // DBInteract class partition for towns
 	}
 	public static DBTown getTownById(LiteDB.ObjectId id)
 	{
-		var t = Database.Instance.GetCollection<DBTown>("towns").Find(LiteDB.Query.EQ("id", id)).FirstOrDefault();
+		var t = Database.Instance.GetCollection<DBTown>("towns").FindById(id);
 		if (t == null)
 		{
 			Console.WriteLine("Town does not exist!");
@@ -108,4 +108,5 @@ public static partial class DBInteract { // DBInteract class partition for towns
 		}
 		return t;
 	}
+	// UNI - FindById bug fix, Claude Sonnet 4.6, applied to all functions with FindById (only getTownById was part of the prompt)
 }

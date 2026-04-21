@@ -17,7 +17,7 @@ public enum availabilityEnum { // Enum for easier availability notice
 public class MCChunk { // Class for Non-DB chunks
 	public int x { get; set; }
     public int z { get; set; }
-    public LiteDB.ObjectId town { get; set; } = LiteDB.ObjectId.Empty; // name of town that owns the land
+    public LiteDB.ObjectId town { get; set; } = LiteDB.ObjectId.Empty; // id of town that owns the land
 }
 
 public class DBChunk : MCChunk { // Class (of MCChunk) for DB chunks

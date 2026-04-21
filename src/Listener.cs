@@ -199,16 +199,15 @@ public class RespublicaListener : Listener
 
 	// pvp
 	[EventHandler]
-	public void onPVP(EntityDamageByEntityEvent e)
+	public void onPVP(EntityDamageByEntityEvent e) // UNI - guaranteed not to function correctly, fix when able to
 	{
 		if (e.getDamager().getType() != EntityType.PLAYER) return;
 		if (MOBS.Contains(e.getEntity().getType())) return; // if hostile, don't trigger this
 
 		var cloc = Chunk.cToCC(((Player)e.getDamager()).getLocation());
 		var chunk = Chunk.getChunk(cloc.x, cloc.z);
-		var town = DBInteract.getTownById(chunk?.town ?? LiteDB.ObjectId.Empty);
-
 		if (chunk == null) return;
+		var town = DBInteract.getTownById(chunk?.town ?? LiteDB.ObjectId.Empty);
 
 		if (town != DBInteract.getTown((Player)e.getDamager()))
 		{
