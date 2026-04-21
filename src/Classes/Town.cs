@@ -8,8 +8,8 @@ public class MCTown { // Class for non-DB towns
 //  public int bal; // TODO: implement once eco plugins become a thing with apis n shit
     public PlotPerm perm { get; set; } = new();
     public Guid mayor { get; set; } = Guid.Empty;
-    public List<Guid> residents { get; set; } = new List<Guid>();
-	public MCChunk homeChunk { get; set; } = Chunk.initChunk(0, 0, LiteDB.ObjectId.Empty); // blank nothing chunk
+    public List<Guid> residents { get; set; } = [];
+	public ChunkCoord homeChunk { get; set; } = new(); // blank nothing chunk
 }
 
 public class DBTown : MCTown { // Class for DB towns
@@ -42,13 +42,15 @@ public static partial class DBInteract { // DBInteract class partition for towns
 			return;
 		}
 		var ccoord = Chunk.cToCC(mayor.getLocation());
-		var newc = Chunk.initChunk(ccoord.x, ccoord.z, getTown(name).id);
+		var id = LiteDB.ObjectId.NewObjectId();
        	var newtown = new DBTown
     	{
+			id = id,
         	name = name,
         	mayor = mayor.getUniqueId(),
-			homeChunk = newc
+			homeChunk = ccoord
         };
+		var newc = Chunk.initChunk(ccoord.x, ccoord.z, id);
         newtown.residents.Add(mayor.getUniqueId());
 		
 		createChunk(newc); // create the chunk
