@@ -100,7 +100,7 @@ public static partial class DBInteract { // DBInteract class partition for towns
 	}
 	public static DBTown getTownById(LiteDB.ObjectId id)
 	{
-		var t = Database.Instance.GetCollection<DBTown>("towns").Find(x => x.id == id).FirstOrDefault();
+		var t = Database.Instance.GetCollection<DBTown>("towns").Find(LiteDB.Query.EQ("id", id)).FirstOrDefault();
 		if (t == null)
 		{
 			Console.WriteLine("Town does not exist!");
