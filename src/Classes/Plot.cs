@@ -19,4 +19,5 @@ public class MCPlot // Class for processing plots
 //  public int price { get; set; }
     public bool forsale { get; set; }
     public PlotPerm perm { get; set; } = new();
+    public List<Guid> trusted { get; set; } = [];
 }

@@ -38,7 +38,7 @@ public class RespublicaCmd : CommandExecutor // Commands for managing invites
                         }
                         mapfinal.Add(ns.ToString());
                     }
-                    mapfinal.Add($"Town: {Town.formatName(DBInteract.getTownById(Chunk.getChunk(mapcoord.x, mapcoord.z)?.town ?? LiteDB.ObjectId.Empty).name)}");
+                    mapfinal.Add($"Town: {Town.formatName(DBInteract.getTownById(Chunk.getChunk(mapcoord.x, mapcoord.z)?.town ?? LiteDB.ObjectId.Empty)?.name ?? "None")}");
                     sender.sendMessage([.. mapfinal]);
                     break;
             }

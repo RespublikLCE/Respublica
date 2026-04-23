@@ -13,7 +13,7 @@ public class PlotCmd : CommandExecutor // Commands for managing invites
         var chunk = Chunk.getChunk(pcoord.x, pcoord.z) ?? new();
         var t = DBInteract.getTownById(chunk.town);
         var plot = chunk.plot;
-        if (DBInteract.getTownById(chunk.town) == new DBTown()) // UNI - for not showing how bad the plot code is
+        if (t == null) // UNI - for not showing how bad the plot code is
         {
             plot.perm.PVP = true; plot.perm.EXPLOSION = true; plot.perm.FIRE = true; plot.perm.MOBS = true;
         }
@@ -25,7 +25,7 @@ public class PlotCmd : CommandExecutor // Commands for managing invites
         if (args.Length == 0)
         {
             sender.sendMessage($"--- Plot ({pcoord.x}, {pcoord.z}) ---");
-            sender.sendMessage(string.Format("Town: {0}", string.IsNullOrEmpty(t.name) ? "None" : Town.formatName(t.name))); // UNI - don't question the string.Format use
+            sender.sendMessage(string.Format("Town: {0}", string.IsNullOrEmpty(t?.name) ? "None" : Town.formatName(t.name))); // UNI - don't question the string.Format use
             sender.sendMessage(string.Format("Owner: {0}", string.IsNullOrEmpty(Plr.guidToUsrname(plot.owner)) ? "None" : Plr.guidToUsrname(plot.owner)));
             sender.sendMessage($"PVP: {plot.perm.PVP} EXPLOSIONS: {plot.perm.EXPLOSION} FIRE: {plot.perm.FIRE} MOBS: {plot.perm.MOBS}");
             sender.sendMessage(plot.forsale ? "Plot for sale! Do [/plot claim] to claim this plot." : "Plot not for sale.");

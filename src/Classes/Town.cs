@@ -8,7 +8,7 @@ public class MCTown { // Class for non-DB towns
 //  public int bal; // TODO: implement once eco plugins become a thing with apis n shit
     public PlotPerm perm { get; set; } = new();
     public Guid mayor { get; set; } = Guid.Empty;
-    public List<Guid> residents { get; set; } = [];
+    public List<Guid> trusted { get; set; } = [];
 	public ChunkCoord homeChunk { get; set; } = new(); // blank nothing chunk
 }
 
@@ -51,7 +51,9 @@ public static partial class DBInteract { // DBInteract class partition for towns
 			homeChunk = ccoord
         };
 		var newc = Chunk.initChunk(ccoord.x, ccoord.z, id);
-        newtown.residents.Add(mayor.getUniqueId());
+		var newp = getPlr(mayor.getUniqueId());
+		newp.town = id;
+        updatePlr(newp, newp);
 		
 		createChunk(newc); // create the chunk
 		col.Insert(newtown);
@@ -95,11 +97,10 @@ public static partial class DBInteract { // DBInteract class partition for towns
 	}
 	public static DBTown getTown(Player plr)
 	{
-		var col = Database.Instance.GetCollection<DBTown>("towns");
-		var getT = col.Find(x => x.residents.Contains(plr.getUniqueId()))?.FirstOrDefault(); // UNI - total eyesore
+		var getT = getTownById(getPlr(plr.getUniqueId()).town); // UNI - total eyesore
 		if (getT == null) return new DBTown();
-		else return getT;
+		return getT;
 	}
-	public static DBTown getTownById(LiteDB.ObjectId id) => Database.Instance.GetCollection<DBTown>("towns").FindById(id) ?? new();
+	public static DBTown? getTownById(LiteDB.ObjectId id) => Database.Instance.GetCollection<DBTown>("towns").FindById(id);
 	// UNI - FindById bug fix, Claude Sonnet 4.6, applied to all functions with FindById (only getTownById was part of the prompt)
 }

@@ -12,7 +12,7 @@ public class InvCmd : CommandExecutor // Commands for managing invites
         if (args.Length == 0)
         {
             sender.sendMessage("--- Town invites ---");
-            foreach (var al0town in DBInteract.getPlr(((Player)sender).getUniqueId()).invites) sender.sendMessage(DBInteract.getTownById(al0town.id).name);
+            foreach (var al0town in DBInteract.getPlr(((Player)sender).getUniqueId()).invites) sender.sendMessage(DBInteract.getTownById(al0town.id)?.name ?? "None");
             sender.sendMessage("Do /invite accept [name] to join a town!");
         }
 
@@ -36,7 +36,6 @@ public class InvCmd : CommandExecutor // Commands for managing invites
 
                     DBInteract.updatePlr(DBInteract.getPlr(((Player)sender).getUniqueId()), acplr);
                     var actown = DBInteract.getTown(args[1]);
-                    actown.residents.Add(((Player)sender).getUniqueId());
                     DBInteract.updateTown(DBInteract.getTown(args[1]), actown);
 
                     sender.sendMessage($"You have joined {args[1]}!");

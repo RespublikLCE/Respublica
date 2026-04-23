@@ -79,7 +79,7 @@ internal sealed class RespublicaListener : Listener
 
 		if (c2 != null && c1?.town != c2.town)
 		{
-			e.getPlayer().sendMessage($"Entering {DBInteract.getTownById(c2.town).name}!");
+			e.getPlayer().sendMessage($"Entering {DBInteract.getTownById(c2.town)?.name ?? "a town"}!");
 		}
 		if (c1 != null && c2 == null)
 		{
@@ -99,7 +99,7 @@ internal sealed class RespublicaListener : Listener
 
 		if (chunk == null) return;
 
-		if ((chunk?.town ?? LiteDB.ObjectId.Empty) != DBInteract.getTown(e.getPlayer()).id)
+		if (!(DBInteract.getTownById(chunk.town)?.trusted ?? []).Contains(e.getPlayer().getUniqueId()))
 		{
 			e.getPlayer().sendMessage(toTex(eventEnum.INTERACT_ERR));
 			e.setCancelled(true);
@@ -115,7 +115,7 @@ internal sealed class RespublicaListener : Listener
 
 		if (chunk == null) return;
 
-		if ((chunk?.town ?? LiteDB.ObjectId.Empty) != DBInteract.getTown(e.getPlayer()).id)
+		if (!(DBInteract.getTownById(chunk.town)?.trusted ?? []).Contains(e.getPlayer().getUniqueId()))
 		{
 			e.getPlayer().sendMessage(toTex(eventEnum.INTERACT_ERR));
 			e.setCancelled(true);
@@ -134,7 +134,7 @@ internal sealed class RespublicaListener : Listener
 
 		if (chunk == null) return;
 
-		if ((chunk?.town ?? LiteDB.ObjectId.Empty) != DBInteract.getTown(plr).id)
+		if (!(DBInteract.getTownById(chunk.town)?.trusted ?? []).Contains(plr.getUniqueId()))
 		{
 			plr.sendMessage(toTex(eventEnum.INTERACT_ERR));
 			e.setCancelled(true);
@@ -151,7 +151,7 @@ internal sealed class RespublicaListener : Listener
 
 		if (chunk == null) return;
 
-		if ((chunk?.town ?? LiteDB.ObjectId.Empty) != DBInteract.getTown(e.getPlayer()).id)
+		if (!(DBInteract.getTownById(chunk.town)?.trusted ?? []).Contains(e.getPlayer().getUniqueId()))
 		{
 			e.getPlayer().sendMessage(toTex(eventEnum.BREAK_ERR));
 			e.setCancelled(true);
@@ -167,7 +167,7 @@ internal sealed class RespublicaListener : Listener
 
 		if (chunk == null) return;
 
-		if ((chunk?.town ?? LiteDB.ObjectId.Empty) != DBInteract.getTown(e.getPlayer()).id)
+		if (!(DBInteract.getTownById(chunk.town)?.trusted ?? []).Contains(e.getPlayer().getUniqueId()))
 		{
 			e.getPlayer().sendMessage(toTex(eventEnum.PLACE_ERR));
 			e.setCancelled(true);
@@ -204,7 +204,7 @@ internal sealed class RespublicaListener : Listener
 		var chunk = Chunk.getChunk(cloc.x, cloc.z);
 		if (chunk == null) return;
 
-		if ((chunk?.town ?? LiteDB.ObjectId.Empty) != DBInteract.getTown((Player)e.getDamager()).id)
+		if (!chunk.plot.perm.PVP)
 		{
 			if (e.getEntity().getType() == EntityType.PLAYER) ((Player)e.getDamager()).sendMessage(toTex(eventEnum.PVP_ERR));
 			else ((Player)e.getDamager()).sendMessage(toTex(eventEnum.ATTK_ERR));

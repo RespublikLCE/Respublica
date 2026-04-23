@@ -28,7 +28,8 @@ public class Respublica : ServerPlugin
     {
         Database.Instance.Dispose();
 		if (!Directory.Exists(path)) {
-			Console.WriteLine("[RESPUBLICA] PluginDB directory missing! Restart server to create automatically.");
+			Console.WriteLine("[RESPUBLICA] PluginDB directory missing! Make sure the server folder isn't read-only or administrator.");
+			Console.WriteLine("You can also just create it manually.");
 		}
     }
 }

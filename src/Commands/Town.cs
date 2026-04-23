@@ -62,7 +62,7 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 							break;
 						case "mayor":
 							if (args.Length < 3) { sender.sendMessage("Invalid set command."); break; }
-							if (!t.residents.Exists(x => x == Plr.usrToGuid(args[2]))) break;
+							if (DBInteract.getPlr(Plr.usrToGuid(args[2])).town != t.id) break;
 							var newmayor = Plr.usrToGuid(args[2]);
 
 							var newt = (MCTown)t;
@@ -132,7 +132,7 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 					{
 						case "add":
 							if (args.Length < 3) { sender.sendMessage("Invalid invite command."); break; }
-							if (t.residents.Exists(x => x == Plr.usrToGuid(args[2]))) {sender.sendMessage($"Player {args[2]} is already in this town!");break;}
+							if (DBInteract.getPlr(Plr.usrToGuid(args[2])).town == t.id) {sender.sendMessage($"Player {args[2]} is already in this town!");break;}
 							if (DBInteract.getPlr(Plr.usrToGuid(args[2])).town != LiteDB.ObjectId.Empty) {sender.sendMessage($"Player {args[2]} is already in another town!");break;}
 							if (!DBInteract.isPlrReal(Plr.usrToGuid(args[2]))) {sender.sendMessage($"Player {args[2]} is not registered on this server.");break;}
 							var newjoin = Plr.usrToGuid(args[2]);
@@ -142,6 +142,38 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 							break;
 					}
 
+					break;
+				case "trust":
+					if (args.Length < 2) { sender.sendMessage("Invalid trust command."); break; }
+
+					if (string.IsNullOrEmpty(t.name)) {
+                        sender.sendMessage("You don't have a town!");
+                        break;
+                	}
+
+					switch (args[1]) // sub-sub command
+					{
+						case "add":
+							if (args.Length < 3) { sender.sendMessage("Invalid trust command."); break; }
+							if (t.trusted.Contains(Plr.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} is already trusted in this town!"); break; }
+							if (!DBInteract.isPlrReal(Plr.usrToGuid(args[2]))) {sender.sendMessage($"Player {args[2]} is not registered on this server.");break;}
+							t.trusted.Add(Plr.usrToGuid(args[2]));
+							DBInteract.updateTown(t, t);
+							sender.sendMessage($"Trusted {args[2]} in this town.");
+							break;
+						case "remove":
+							if (args.Length < 3) { sender.sendMessage("Invalid trust command."); break; }
+							if (!t.trusted.Contains(Plr.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} already isn't trusted!"); break; }
+							// no need to check if usr is real
+							t.trusted.Remove(Plr.usrToGuid(args[2]));
+							DBInteract.updateTown(t, t);
+							sender.sendMessage($"Untrusted {args[2]} in this town.");
+							break;
+						case "list":
+							sender.sendMessage("--- Trusted ---");
+            				foreach (var tlp in t.trusted) sender.sendMessage(Plr.guidToUsrname(tlp) ?? "? (Invalid user)");
+							break;
+					}
 					break;
 			}
 		}
