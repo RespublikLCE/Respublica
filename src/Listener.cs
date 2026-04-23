@@ -99,6 +99,9 @@ internal sealed class RespublicaListener : Listener
 
 		if (chunk == null) return;
 
+		if ((DBInteract.getTownById(chunk.town)?.mayor ?? Guid.Empty) == e.getPlayer().getUniqueId()) return;
+		if (chunk.plot.trusted.Contains(e.getPlayer().getUniqueId())) return;
+
 		if (!(DBInteract.getTownById(chunk.town)?.trusted ?? []).Contains(e.getPlayer().getUniqueId()))
 		{
 			e.getPlayer().sendMessage(toTex(eventEnum.INTERACT_ERR));
@@ -114,6 +117,9 @@ internal sealed class RespublicaListener : Listener
 		var chunk = Chunk.getChunk(cloc.x, cloc.z);
 
 		if (chunk == null) return;
+
+		if ((DBInteract.getTownById(chunk.town)?.mayor ?? Guid.Empty) == e.getPlayer().getUniqueId()) return;
+		if (chunk.plot.trusted.Contains(e.getPlayer().getUniqueId())) return;
 
 		if (!(DBInteract.getTownById(chunk.town)?.trusted ?? []).Contains(e.getPlayer().getUniqueId()))
 		{
@@ -134,6 +140,9 @@ internal sealed class RespublicaListener : Listener
 
 		if (chunk == null) return;
 
+		if ((DBInteract.getTownById(chunk.town)?.mayor ?? Guid.Empty) == plr.getUniqueId()) return;
+		if (chunk.plot.trusted.Contains(plr.getUniqueId())) return;
+
 		if (!(DBInteract.getTownById(chunk.town)?.trusted ?? []).Contains(plr.getUniqueId()))
 		{
 			plr.sendMessage(toTex(eventEnum.INTERACT_ERR));
@@ -151,6 +160,9 @@ internal sealed class RespublicaListener : Listener
 
 		if (chunk == null) return;
 
+		if ((DBInteract.getTownById(chunk.town)?.mayor ?? Guid.Empty) == e.getPlayer().getUniqueId()) return;
+		if (chunk.plot.trusted.Contains(e.getPlayer().getUniqueId())) return;
+
 		if (!(DBInteract.getTownById(chunk.town)?.trusted ?? []).Contains(e.getPlayer().getUniqueId()))
 		{
 			e.getPlayer().sendMessage(toTex(eventEnum.BREAK_ERR));
@@ -166,6 +178,9 @@ internal sealed class RespublicaListener : Listener
 		var chunk = Chunk.getChunk(cloc.x, cloc.z);
 
 		if (chunk == null) return;
+
+		if ((DBInteract.getTownById(chunk.town)?.mayor ?? Guid.Empty) == e.getPlayer().getUniqueId()) return;
+		if (chunk.plot.trusted.Contains(e.getPlayer().getUniqueId())) return;
 
 		if (!(DBInteract.getTownById(chunk.town)?.trusted ?? []).Contains(e.getPlayer().getUniqueId()))
 		{

@@ -154,6 +154,7 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 					switch (args[1]) // sub-sub command
 					{
 						case "add":
+							if (t.mayor != ((Player)sender).getUniqueId()) { sender.sendMessage("You do not have permission to use this command."); break; }
 							if (args.Length < 3) { sender.sendMessage("Invalid trust command."); break; }
 							if (t.trusted.Contains(Plr.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} is already trusted in this town!"); break; }
 							if (!DBInteract.isPlrReal(Plr.usrToGuid(args[2]))) {sender.sendMessage($"Player {args[2]} is not registered on this server.");break;}
@@ -162,6 +163,7 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 							sender.sendMessage($"Trusted {args[2]} in this town.");
 							break;
 						case "remove":
+							if (t.mayor != ((Player)sender).getUniqueId()) { sender.sendMessage("You do not have permission to use this command."); break; }
 							if (args.Length < 3) { sender.sendMessage("Invalid trust command."); break; }
 							if (!t.trusted.Contains(Plr.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} already isn't trusted!"); break; }
 							// no need to check if usr is real

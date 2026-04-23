@@ -45,6 +45,35 @@ public class PlotCmd : CommandExecutor // Commands for managing invites
                     DBInteract.updateChunk(chunk, chunk); // UNI - how did i never think of doing this
                     sender.sendMessage($"Claimed plot {{{pcoord.x}, {pcoord.z}}}");
                     break;
+                case "trust":
+					if (args.Length < 2) { sender.sendMessage("Invalid trust command."); break; }
+
+					switch (args[1]) // sub-sub command
+					{
+						case "add":
+							if (plot.owner != ((Player)sender).getUniqueId()) { sender.sendMessage("You don't own this plot!"); break; }
+							if (args.Length < 3) { sender.sendMessage("Invalid trust command."); break; }
+							if (plot.trusted.Contains(Plr.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} is already trusted in this plot!"); break; }
+							if (!DBInteract.isPlrReal(Plr.usrToGuid(args[2]))) {sender.sendMessage($"Player {args[2]} is not registered on this server.");break;}
+							chunk.plot.trusted.Add(Plr.usrToGuid(args[2]));
+							DBInteract.updateChunk(chunk, chunk);
+							sender.sendMessage($"Trusted {args[2]} in this plot.");
+							break;
+						case "remove":
+							if (plot.owner != ((Player)sender).getUniqueId()) { sender.sendMessage("You don't own this plot!"); break; }
+							if (args.Length < 3) { sender.sendMessage("Invalid trust command."); break; }
+							if (!plot.trusted.Contains(Plr.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} already isn't trusted!"); break; }
+							// no need to check if usr is real
+							chunk.plot.trusted.Remove(Plr.usrToGuid(args[2]));
+							DBInteract.updateChunk(chunk, chunk);
+							sender.sendMessage($"Untrusted {args[2]} in this plot.");
+							break;
+						case "list":
+							sender.sendMessage("--- Trusted ---");
+            				foreach (var tlp in plot.trusted) sender.sendMessage(Plr.guidToUsrname(tlp) ?? "? (Invalid user)");
+							break;
+					}
+					break;
             }
         }
 
