@@ -9,15 +9,15 @@ public class PlotCmd : CommandExecutor // Commands for managing invites
     {
         if (sender is not Player) return true;
 
-        var pcoord = Chunk.cToCC(((Player)sender).getLocation());
-        var chunk = Chunk.getChunk(pcoord.x, pcoord.z) ?? new();
+        var pcoord = ChunkInteract.cToCC(((Player)sender).getLocation());
+        var chunk = ChunkInteract.getChunk(pcoord.x, pcoord.z) ?? new();
         var t = DBInteract.getTownById(chunk.town);
         var plot = chunk.plot;
         if (t == null) // UNI - for not showing how bad the plot code is
         {
             plot.perm.PVP = true; plot.perm.EXPLOSION = true; plot.perm.FIRE = true; plot.perm.MOBS = true;
         }
-        else if (string.IsNullOrEmpty(Plr.guidToUsrname(plot.owner)))
+        else if (string.IsNullOrEmpty(PlrInteract.guidToUsrname(plot.owner)))
         {
             plot.perm.PVP = t.perm.PVP; plot.perm.EXPLOSION = t.perm.EXPLOSION; plot.perm.FIRE = t.perm.FIRE; plot.perm.MOBS = t.perm.MOBS;
         }
@@ -25,15 +25,15 @@ public class PlotCmd : CommandExecutor // Commands for managing invites
         if (args.Length == 0)
         {
             sender.sendMessage($"--- Plot ({pcoord.x}, {pcoord.z}) ---");
-            sender.sendMessage(string.Format("Town: {0}", string.IsNullOrEmpty(t?.name) ? "None" : Town.formatName(t.name))); // UNI - don't question the string.Format use
-            sender.sendMessage(string.Format("Owner: {0}", string.IsNullOrEmpty(Plr.guidToUsrname(plot.owner)) ? "None" : Plr.guidToUsrname(plot.owner)));
+            sender.sendMessage(string.Format("Town: {0}", string.IsNullOrEmpty(t?.name) ? "None" : TownInteract.formatName(t.name))); // UNI - don't question the string.Format use
+            sender.sendMessage(string.Format("Owner: {0}", string.IsNullOrEmpty(PlrInteract.guidToUsrname(plot.owner)) ? "None" : PlrInteract.guidToUsrname(plot.owner)));
             sender.sendMessage($"PVP: {plot.perm.PVP} EXPLOSIONS: {plot.perm.EXPLOSION} FIRE: {plot.perm.FIRE} MOBS: {plot.perm.MOBS}");
             sender.sendMessage(plot.forsale ? "Plot for sale! Do [/plot claim] to claim this plot." : "Plot not for sale.");
         }
 
         if (args.Length > 0)
         {
-            if (string.IsNullOrEmpty(Plr.guidToUsrname(((Player)sender).getUniqueId()))) return true;
+            if (string.IsNullOrEmpty(PlrInteract.guidToUsrname(((Player)sender).getUniqueId()))) return true;
             switch (args[0])
             {
                 case "claim":
@@ -53,24 +53,24 @@ public class PlotCmd : CommandExecutor // Commands for managing invites
 						case "add":
 							if (plot.owner != ((Player)sender).getUniqueId()) { sender.sendMessage("You don't own this plot!"); break; }
 							if (args.Length < 3) { sender.sendMessage("Invalid trust command."); break; }
-							if (plot.trusted.Contains(Plr.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} is already trusted in this plot!"); break; }
-							if (!DBInteract.isPlrReal(Plr.usrToGuid(args[2]))) {sender.sendMessage($"Player {args[2]} is not registered on this server.");break;}
-							chunk.plot.trusted.Add(Plr.usrToGuid(args[2]));
+							if (plot.trusted.Contains(PlrInteract.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} is already trusted in this plot!"); break; }
+							if (!DBInteract.isPlrReal(PlrInteract.usrToGuid(args[2]))) {sender.sendMessage($"Player {args[2]} is not registered on this server.");break;}
+							chunk.plot.trusted.Add(PlrInteract.usrToGuid(args[2]));
 							DBInteract.updateChunk(chunk, chunk);
 							sender.sendMessage($"Trusted {args[2]} in this plot.");
 							break;
 						case "remove":
 							if (plot.owner != ((Player)sender).getUniqueId()) { sender.sendMessage("You don't own this plot!"); break; }
 							if (args.Length < 3) { sender.sendMessage("Invalid trust command."); break; }
-							if (!plot.trusted.Contains(Plr.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} already isn't trusted!"); break; }
+							if (!plot.trusted.Contains(PlrInteract.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} already isn't trusted!"); break; }
 							// no need to check if usr is real
-							chunk.plot.trusted.Remove(Plr.usrToGuid(args[2]));
+							chunk.plot.trusted.Remove(PlrInteract.usrToGuid(args[2]));
 							DBInteract.updateChunk(chunk, chunk);
 							sender.sendMessage($"Untrusted {args[2]} in this plot.");
 							break;
 						case "list":
 							sender.sendMessage("--- Trusted ---");
-            				foreach (var tlp in plot.trusted) sender.sendMessage(Plr.guidToUsrname(tlp) ?? "? (Invalid user)");
+            				foreach (var tlp in plot.trusted) sender.sendMessage(PlrInteract.guidToUsrname(tlp) ?? "? (Invalid user)");
 							break;
 					}
 					break;

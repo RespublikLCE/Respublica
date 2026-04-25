@@ -3,12 +3,20 @@
 using Minecraft.Server.FourKit.Plugin;
 using Commands;
 using Minecraft.Server.FourKit;
+using System.Reflection;
+
+internal class ExternalExtra {
+	public string type = "subtown";
+	public required string name;
+	public required MethodInfo func;
+}
 
 public class Respublica : ServerPlugin
 {
 	private static Respublica? _instance;
-
 	public static Respublica? getInstance() => _instance;
+
+	internal List<ExternalExtra> extRegisterFunc = [];
 
 	public override string name => "Respublica";
 	public override string version => "1.0.0-alpha.1";

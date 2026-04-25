@@ -17,15 +17,24 @@ public class TownCmd : CommandExecutor // Commands for managing towns
                         	sender.sendMessage("You don't have a town!");
                         	return true;
                 	}
-			sender.sendMessage($"--- {Town.formatName(t.name)} ---");
+			sender.sendMessage($"--- {TownInteract.formatName(t.name)} ---");
 			sender.sendMessage($"Chunk count: {Database.Instance.GetCollection<DBChunk>("chunks").Count(LiteDB.Query.EQ("town", t.id))}"); // UNI - srry didn't feel like adding a function
-			sender.sendMessage($"Mayor: {Plr.guidToUsrname(t.mayor)}");
+			sender.sendMessage($"Mayor: {PlrInteract.guidToUsrname(t.mayor)}");
 			sender.sendMessage($"PVP: {t.perm.PVP} EXPLOSIONS: {t.perm.EXPLOSION} FIRE: {t.perm.FIRE} MOBS: {t.perm.MOBS}");
 			return true;
 		}
 
 		if (args.Length > 0) {
-			if (string.IsNullOrEmpty(Plr.guidToUsrname(((Player)sender).getUniqueId()))) return true;
+			if (string.IsNullOrEmpty(PlrInteract.guidToUsrname(((Player)sender).getUniqueId()))) return true;
+
+			if ((Respublica.getInstance()?.extRegisterFunc ?? []).Any(x => x.type == "subtown" && x.name == args[0]))
+			{
+				var getregfunc = (Respublica.getInstance()?.extRegisterFunc ?? []).Find(x => x.type == "subtown" && x.name == args[0]);
+				if (getregfunc == null) return true;
+				getregfunc.func.Invoke(getregfunc.func.GetType(), [args]);
+				return true;
+			}
+
 			switch(args[0]) {
 				case "new":
                 case "create":
@@ -34,13 +43,13 @@ public class TownCmd : CommandExecutor // Commands for managing towns
                         sender.sendMessage("You already have a town!");
                         break;
                 	}
-					var cc = Chunk.cToCC(((Player)sender).getLocation());
-					var nc = Chunk.getChunk(cc.x, cc.z);
+					var cc = ChunkInteract.cToCC(((Player)sender).getLocation());
+					var nc = ChunkInteract.getChunk(cc.x, cc.z);
 					
 					if (nc != null) break;
 
 					DBInteract.initTown((Player)sender, args[1]);
-					sender.sendMessage($"Created town \"{Town.formatName(args[1])}\"!");
+					sender.sendMessage($"Created town \"{TownInteract.formatName(args[1])}\"!");
 					break;
 				case "set":
 					if (args.Length < 2) { sender.sendMessage("Invalid set command."); break; }
@@ -55,17 +64,17 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 					{
 						case "name":
 							if (args.Length < 3) { sender.sendMessage("Invalid set command."); break; }
-							var newname = (MCTown)t;
+							var newname = (Town)t;
 							newname.name = args[2];
 							DBInteract.updateTown(t, newname);
-							sender.sendMessage($"Changed town name to \"{Town.formatName(args[2])}\"");
+							sender.sendMessage($"Changed town name to \"{TownInteract.formatName(args[2])}\"");
 							break;
 						case "mayor":
 							if (args.Length < 3) { sender.sendMessage("Invalid set command."); break; }
-							if (DBInteract.getPlr(Plr.usrToGuid(args[2])).town != t.id) break;
-							var newmayor = Plr.usrToGuid(args[2]);
+							if (DBInteract.getPlr(PlrInteract.usrToGuid(args[2])).town != t.id) break;
+							var newmayor = PlrInteract.usrToGuid(args[2]);
 
-							var newt = (MCTown)t;
+							var newt = (Town)t;
 							newt.mayor = newmayor;
 							DBInteract.updateTown(t, newt);
 							sender.sendMessage($"Resigned mayor position to {newmayor}");
@@ -74,9 +83,9 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 						case "block":
 						case "hb":
 						case "homeblock":
-							var newhome = (MCTown)t;
-							var newcoord = Chunk.cToCC(((Player)sender).getLocation());
-							if (Chunk.getChunk(newcoord.x, newcoord.z) == null)
+							var newhome = (Town)t;
+							var newcoord = ChunkInteract.cToCC(((Player)sender).getLocation());
+							if (ChunkInteract.getChunk(newcoord.x, newcoord.z) == null)
 							{
 								sender.sendMessage("Chunk is not available.");
 								break;
@@ -97,9 +106,9 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 
 					if (t.mayor != ((Player)sender).getUniqueId()) { sender.sendMessage("You do not have permission to use this command."); break; }
 
-					var newcoord2 = Chunk.cToCC(((Player)sender).getLocation());
-					var newclaim = Chunk.initChunk(newcoord2.x, newcoord2.z, t.id); // UNI - to put a little less on the db
-					var available = Chunk.chunkAvailable(newclaim, t.id);
+					var newcoord2 = ChunkInteract.cToCC(((Player)sender).getLocation());
+					var newclaim = ChunkInteract.initChunk(newcoord2.x, newcoord2.z, t.id); // UNI - to put a little less on the db
+					var available = ChunkInteract.chunkAvailable(newclaim, t.id);
 					if (available != availabilityEnum.AVAILABLE)
 					{
 						switch (available)
@@ -132,10 +141,10 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 					{
 						case "add":
 							if (args.Length < 3) { sender.sendMessage("Invalid invite command."); break; }
-							if (DBInteract.getPlr(Plr.usrToGuid(args[2])).town == t.id) {sender.sendMessage($"Player {args[2]} is already in this town!");break;}
-							if (DBInteract.getPlr(Plr.usrToGuid(args[2])).town != LiteDB.ObjectId.Empty) {sender.sendMessage($"Player {args[2]} is already in another town!");break;}
-							if (!DBInteract.isPlrReal(Plr.usrToGuid(args[2]))) {sender.sendMessage($"Player {args[2]} is not registered on this server.");break;}
-							var newjoin = Plr.usrToGuid(args[2]);
+							if (DBInteract.getPlr(PlrInteract.usrToGuid(args[2])).town == t.id) {sender.sendMessage($"Player {args[2]} is already in this town!");break;}
+							if (DBInteract.getPlr(PlrInteract.usrToGuid(args[2])).town != LiteDB.ObjectId.Empty) {sender.sendMessage($"Player {args[2]} is already in another town!");break;}
+							if (!DBInteract.isPlrReal(PlrInteract.usrToGuid(args[2]))) {sender.sendMessage($"Player {args[2]} is not registered on this server.");break;}
+							var newjoin = PlrInteract.usrToGuid(args[2]);
 							var newinv = new Invite {id=t.id,expiration=DateTime.UtcNow.AddDays(3)}; // UNI - setting expiration to 3 for now
 							DBInteract.addInvite(newjoin, newinv);
 							sender.sendMessage($"Invited {args[2]} to the town.");
@@ -156,24 +165,24 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 						case "add":
 							if (t.mayor != ((Player)sender).getUniqueId()) { sender.sendMessage("You do not have permission to use this command."); break; }
 							if (args.Length < 3) { sender.sendMessage("Invalid trust command."); break; }
-							if (t.trusted.Contains(Plr.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} is already trusted in this town!"); break; }
-							if (!DBInteract.isPlrReal(Plr.usrToGuid(args[2]))) {sender.sendMessage($"Player {args[2]} is not registered on this server.");break;}
-							t.trusted.Add(Plr.usrToGuid(args[2]));
+							if (t.trusted.Contains(PlrInteract.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} is already trusted in this town!"); break; }
+							if (!DBInteract.isPlrReal(PlrInteract.usrToGuid(args[2]))) {sender.sendMessage($"Player {args[2]} is not registered on this server.");break;}
+							t.trusted.Add(PlrInteract.usrToGuid(args[2]));
 							DBInteract.updateTown(t, t);
 							sender.sendMessage($"Trusted {args[2]} in this town.");
 							break;
 						case "remove":
 							if (t.mayor != ((Player)sender).getUniqueId()) { sender.sendMessage("You do not have permission to use this command."); break; }
 							if (args.Length < 3) { sender.sendMessage("Invalid trust command."); break; }
-							if (!t.trusted.Contains(Plr.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} already isn't trusted!"); break; }
+							if (!t.trusted.Contains(PlrInteract.usrToGuid(args[2]))) { sender.sendMessage($"{args[2]} already isn't trusted!"); break; }
 							// no need to check if usr is real
-							t.trusted.Remove(Plr.usrToGuid(args[2]));
+							t.trusted.Remove(PlrInteract.usrToGuid(args[2]));
 							DBInteract.updateTown(t, t);
 							sender.sendMessage($"Untrusted {args[2]} in this town.");
 							break;
 						case "list":
 							sender.sendMessage("--- Trusted ---");
-            				foreach (var tlp in t.trusted) sender.sendMessage(Plr.guidToUsrname(tlp) ?? "? (Invalid user)");
+            				foreach (var tlp in t.trusted) sender.sendMessage(PlrInteract.guidToUsrname(tlp) ?? "? (Invalid user)");
 							break;
 					}
 					break;

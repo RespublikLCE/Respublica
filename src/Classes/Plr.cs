@@ -8,7 +8,7 @@ public class Invite // Class for processing invites
     public DateTime expiration { get; set; } = DateTime.UtcNow;
 }
 
-public class MCPlr // Class for players and for default plot permissions
+public class Plr // Class for players and for default plot permissions
 {
     public string name { get; set; } = "";
     public Guid uid { get; set; } = Guid.Empty;
@@ -17,12 +17,12 @@ public class MCPlr // Class for players and for default plot permissions
     public List<Invite> invites { get; set; } = [];
 }
 
-public class DBPlr : MCPlr // DB class for player
+public class DBPlr : Plr // DB class for player
 {
     public LiteDB.ObjectId id { get; set; } = LiteDB.ObjectId.NewObjectId();
 }
 // UNI - literally only made this for guid to username LOL
-public static class Plr // Class for processing player classes
+public static class PlrInteract // Class for processing player classes
 {
     public static string guidToUsrname(Guid uid)
     {
@@ -51,9 +51,9 @@ public static class Plr // Class for processing player classes
         }
         return plr.uid;
     }
-    public static MCPlr initPlr(Guid uid, string name)
+    public static Plr initPlr(Guid uid, string name)
     {
-        var plr = new MCPlr
+        var plr = new Plr
         {
             name = name,
             uid = uid
@@ -105,7 +105,7 @@ public static partial class DBInteract // DBInteract class partition for players
 
         col.Insert(dbplr);
     }
-    public static void updatePlr(DBPlr plr, MCPlr nplr)
+    public static void updatePlr(DBPlr plr, Plr nplr)
     {
         var col = Database.Instance.GetCollection<DBPlr>("plr");
 		if (col.FindOne(x => x.uid == plr.uid) == null) {
@@ -114,7 +114,7 @@ public static partial class DBInteract // DBInteract class partition for players
 		}
 
         var dbp = new DBPlr();
-		foreach (var prop in typeof(MCPlr).GetProperties())
+		foreach (var prop in typeof(Plr).GetProperties())
 		{
 			if (prop.CanWrite) prop.SetValue(dbp, prop.GetValue(nplr));
 		} // Convert MCPlr to DBPlr

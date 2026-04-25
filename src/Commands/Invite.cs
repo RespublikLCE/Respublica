@@ -18,7 +18,7 @@ public class InvCmd : CommandExecutor // Commands for managing invites
 
         if (args.Length > 0)
         {
-            if (string.IsNullOrEmpty(Plr.guidToUsrname(((Player)sender).getUniqueId()))) return true;
+            if (string.IsNullOrEmpty(PlrInteract.guidToUsrname(((Player)sender).getUniqueId()))) return true;
             switch (args[0])
             {
                 case "accept":

@@ -14,24 +14,24 @@ public enum availabilityEnum { // Enum for easier availability notice
 	NOT_NEAR // not near any town chunks
 }
 
-public class MCChunk { // Class for Non-DB chunks
+public class Chunk { // Class for Non-DB chunks
 	public int x { get; set; }
     public int z { get; set; }
     public LiteDB.ObjectId town { get; set; } = LiteDB.ObjectId.Empty; // id of town that owns the land
-	public MCPlot plot = new();
+	public Plot plot = new();
 }
 
-public class DBChunk : MCChunk { // Class (of MCChunk) for DB chunks
+public class DBChunk : Chunk { // Class (of MCChunk) for DB chunks
 	public LiteDB.ObjectId id { get; set; } = LiteDB.ObjectId.NewObjectId();
 }
 
-public static class Chunk { // Class for processing chunks in certain ways
-	public static MCChunk initChunk(int x, int z, LiteDB.ObjectId town) => new() { x=x, z=z, town=town};
+public static class ChunkInteract { // Class for processing chunks in certain ways
+	public static Chunk initChunk(int x, int z, LiteDB.ObjectId town) => new() { x=x, z=z, town=town};
 
-	public static DBChunk initDBc(MCChunk chunk)
+	public static DBChunk initDBc(Chunk chunk)
 	{
 		var dbc = new DBChunk();
-		foreach (var prop in typeof(MCChunk).GetProperties())
+		foreach (var prop in typeof(Chunk).GetProperties())
 		{
 			if (prop.CanWrite) prop.SetValue(dbc, prop.GetValue(chunk));
 		}
@@ -43,7 +43,7 @@ public static class Chunk { // Class for processing chunks in certain ways
 		return col.Find(LiteDB.Query.EQ("x", x)).FirstOrDefault(e => e.z == z);
 	}
 
-	public static List<DBChunk> nearChunks(MCChunk chunk) {
+	public static List<DBChunk> nearChunks(Chunk chunk) {
 		var result = new List<DBChunk>();
 		for (int i=0;i<4;i++) {
 			int cx = 0;
@@ -62,7 +62,7 @@ public static class Chunk { // Class for processing chunks in certain ways
 		return result;
 	}
 
-	public static availabilityEnum chunkAvailable(MCChunk chunk, LiteDB.ObjectId town) { // chunk format: x is the chunk x, z is the chunk z, town is the town that is requesting availability
+	public static availabilityEnum chunkAvailable(Chunk chunk, LiteDB.ObjectId town) { // chunk format: x is the chunk x, z is the chunk z, town is the town that is requesting availability
 		var tcheck = getChunk(chunk.x, chunk.z); // gets the REAL town in that chunk, null if unclaimed
 		if (tcheck != null) {
 			if (tcheck.town == chunk.town) return availabilityEnum.SELF_CLAIMED;
@@ -77,25 +77,25 @@ public static class Chunk { // Class for processing chunks in certain ways
 }
 
 public static partial class DBInteract { // DB class partition for chunks
-	public static void createChunk(MCChunk chunk) {
+	public static void createChunk(Chunk chunk) {
 		var col = Database.Instance.GetCollection<DBChunk>("chunks");
-		if (Chunk.getChunk(chunk.x, chunk.z) != null) {
+		if (ChunkInteract.getChunk(chunk.x, chunk.z) != null) {
 			Console.WriteLine("[RESPUBLICA] Tried to initialize DB chunk that already exists!");
 			return;
 		}
-		col.Insert(Chunk.initDBc(chunk));
+		col.Insert(ChunkInteract.initDBc(chunk));
 	}
 	public static void remChunk(DBChunk chunk) {
 		var col = Database.Instance.GetCollection<DBChunk>("chunks");
-		if (Chunk.getChunk(chunk.x, chunk.z) == null) {
+		if (ChunkInteract.getChunk(chunk.x, chunk.z) == null) {
 			Console.WriteLine("[RESPUBLICA] Tried to unclaim DB chunk that doesn't exist!");
 			return;
 		}
 		col.Delete(chunk.id);
 	}
-	public static void updateChunk(DBChunk chunk, MCChunk newchunk) {
+	public static void updateChunk(DBChunk chunk, Chunk newchunk) {
 		var col = Database.Instance.GetCollection<DBChunk>("chunks");
-		if (Chunk.getChunk(chunk.x, chunk.z) == null) {
+		if (ChunkInteract.getChunk(chunk.x, chunk.z) == null) {
 			Console.WriteLine("[RESPUBLICA] Tried to modify non-existent chunk!");
 			return;
 		}

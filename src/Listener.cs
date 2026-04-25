@@ -57,7 +57,7 @@ internal sealed class RespublicaListener : Listener
 	public void onJoin(PlayerJoinEvent e)
 	{
 		if (!DBInteract.isPlrReal(e.getPlayer().getUniqueId())) {
-			if (Plr.usrToGuid(e.getPlayer().getName()) != Guid.Empty) {
+			if (PlrInteract.usrToGuid(e.getPlayer().getName()) != Guid.Empty) {
 				e.getPlayer().sendMessage("[RESPUBLICA] Someone has already joined this server with your username!");
 				e.getPlayer().sendMessage("Because of this, you won't be able to interact with Respublica until you have a different name.");
 				return;
@@ -72,10 +72,10 @@ internal sealed class RespublicaListener : Listener
 	[EventHandler]
 	public void onMove(PlayerMoveEvent e)
 	{
-		var cloc1 = Chunk.cToCC(e.getFrom());
-		var cloc2 = Chunk.cToCC(e.getTo());
-		var c1 = Chunk.getChunk(cloc1.x, cloc1.z);
-		var c2 = Chunk.getChunk(cloc2.x, cloc2.z);
+		var cloc1 = ChunkInteract.cToCC(e.getFrom());
+		var cloc2 = ChunkInteract.cToCC(e.getTo());
+		var c1 = ChunkInteract.getChunk(cloc1.x, cloc1.z);
+		var c2 = ChunkInteract.getChunk(cloc2.x, cloc2.z);
 
 		if (c2 != null && c1?.town != c2.town)
 		{
@@ -94,8 +94,8 @@ internal sealed class RespublicaListener : Listener
 	public void onInteract(PlayerInteractEvent e)
 	{
 		if (e.getAction() != Minecraft.Server.FourKit.Block.Action.RIGHT_CLICK_BLOCK) return;
-		var cloc = Chunk.cToCC(e.getClickedBlock().getLocation()); // UNI - don't worry abt this, its already guaranteed to be not-null
-		var chunk = Chunk.getChunk(cloc.x, cloc.z);
+		var cloc = ChunkInteract.cToCC(e.getClickedBlock().getLocation()); // UNI - don't worry abt this, its already guaranteed to be not-null
+		var chunk = ChunkInteract.getChunk(cloc.x, cloc.z);
 
 		if (chunk == null) return;
 
@@ -113,8 +113,8 @@ internal sealed class RespublicaListener : Listener
 	[EventHandler]
 	public void onInteractEntity(PlayerInteractEntityEvent e)
 	{
-		var cloc = Chunk.cToCC(e.getRightClicked().getLocation());
-		var chunk = Chunk.getChunk(cloc.x, cloc.z);
+		var cloc = ChunkInteract.cToCC(e.getRightClicked().getLocation());
+		var chunk = ChunkInteract.getChunk(cloc.x, cloc.z);
 
 		if (chunk == null) return;
 
@@ -135,8 +135,8 @@ internal sealed class RespublicaListener : Listener
 		var plr = e.getPlayer();
 		if (plr == null) return;
 
-		var cloc = Chunk.cToCC(e.getLocation());
-		var chunk = Chunk.getChunk(cloc.x, cloc.z);
+		var cloc = ChunkInteract.cToCC(e.getLocation());
+		var chunk = ChunkInteract.getChunk(cloc.x, cloc.z);
 
 		if (chunk == null) return;
 
@@ -155,8 +155,8 @@ internal sealed class RespublicaListener : Listener
 	[EventHandler]
 	public void onBreak(BlockBreakEvent e)
 	{
-		var cloc = Chunk.cToCC(e.getBlock().getLocation());
-		var chunk = Chunk.getChunk(cloc.x, cloc.z);
+		var cloc = ChunkInteract.cToCC(e.getBlock().getLocation());
+		var chunk = ChunkInteract.getChunk(cloc.x, cloc.z);
 
 		if (chunk == null) return;
 
@@ -174,8 +174,8 @@ internal sealed class RespublicaListener : Listener
 	[EventHandler]
 	public void onPlace(BlockPlaceEvent e)
 	{
-		var cloc = Chunk.cToCC(e.getBlock().getLocation());
-		var chunk = Chunk.getChunk(cloc.x, cloc.z);
+		var cloc = ChunkInteract.cToCC(e.getBlock().getLocation());
+		var chunk = ChunkInteract.getChunk(cloc.x, cloc.z);
 
 		if (chunk == null) return;
 
@@ -197,9 +197,9 @@ internal sealed class RespublicaListener : Listener
 		var to = e.getToBlock();
 
 		if (
-		Chunk.getChunk(from.getChunk().getX(), from.getChunk().getZ())?.town !=
-		 Chunk.getChunk(to.getChunk().getX(), to.getChunk().getZ())?.town &&
-		Chunk.getChunk(to.getChunk().getX(), to.getChunk().getZ())?.town !=
+		ChunkInteract.getChunk(from.getChunk().getX(), from.getChunk().getZ())?.town !=
+		 ChunkInteract.getChunk(to.getChunk().getX(), to.getChunk().getZ())?.town &&
+		ChunkInteract.getChunk(to.getChunk().getX(), to.getChunk().getZ())?.town !=
 		 null
 		) // only trigger when the var from block's chunk isn't the same town as var to's chunk and only do that if to's town isn't empty
 		{
@@ -215,8 +215,8 @@ internal sealed class RespublicaListener : Listener
 		if (e.getDamager().getType() != EntityType.PLAYER) return;
 		if (MOBS.Contains(e.getEntity().getType())) return; // if hostile, don't trigger this
 
-		var cloc = Chunk.cToCC(((Player)e.getDamager()).getLocation());
-		var chunk = Chunk.getChunk(cloc.x, cloc.z);
+		var cloc = ChunkInteract.cToCC(((Player)e.getDamager()).getLocation());
+		var chunk = ChunkInteract.getChunk(cloc.x, cloc.z);
 		if (chunk == null) return;
 
 		if (!chunk.plot.perm.PVP)

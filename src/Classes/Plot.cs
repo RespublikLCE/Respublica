@@ -10,7 +10,7 @@ public class PlotPerm
 
 // UNI - decided to separate plots from general chunk information, might change at some later time
 // UNI - not changing, but i did make MCPlot technically part of MCChunk the same way i did with PlotPerm
-public class MCPlot // Class for processing plots
+public class Plot // Class for processing plots
 {
     public Guid owner { get; set; } = Guid.Empty;
     // configs

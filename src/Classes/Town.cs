@@ -3,20 +3,21 @@ namespace Respublica;
 using System.Text;
 using Minecraft.Server.FourKit.Entity;
 
-public class MCTown { // Class for non-DB towns
+public class Town { // Class for non-DB towns
 	public string name { get; set; } = "";
 //  public int bal; // TODO: implement once eco plugins become a thing with apis n shit
     public PlotPerm perm { get; set; } = new();
     public Guid mayor { get; set; } = Guid.Empty;
     public List<Guid> trusted { get; set; } = [];
 	public ChunkCoord homeChunk { get; set; } = new(); // blank nothing chunk
+	public Dictionary<string, object> attributes {get; set; } = [];
 }
 
-public class DBTown : MCTown { // Class for DB towns
+public class DBTown : Town { // Class for DB towns
 	public LiteDB.ObjectId id { get; set; } = LiteDB.ObjectId.NewObjectId();
 }
 
-public static class Town // Class for processing towns
+public static class TownInteract // Class for processing towns
 {
 	public static string formatName(string name) => name.Replace("_", " ");
 	public static string RemoveSpecialCharacters(this string str) {
@@ -41,7 +42,7 @@ public static partial class DBInteract { // DBInteract class partition for towns
 			Console.WriteLine("[RESPUBLICA] Mayor already has a town!");
 			return;
 		}
-		var ccoord = Chunk.cToCC(mayor.getLocation());
+		var ccoord = ChunkInteract.cToCC(mayor.getLocation());
 		var id = LiteDB.ObjectId.NewObjectId();
        	var newtown = new DBTown
     	{
@@ -50,7 +51,7 @@ public static partial class DBInteract { // DBInteract class partition for towns
         	mayor = mayor.getUniqueId(),
 			homeChunk = ccoord
         };
-		var newc = Chunk.initChunk(ccoord.x, ccoord.z, id);
+		var newc = ChunkInteract.initChunk(ccoord.x, ccoord.z, id);
 		var newp = getPlr(mayor.getUniqueId());
 		newp.town = id;
         updatePlr(newp, newp);
@@ -66,7 +67,7 @@ public static partial class DBInteract { // DBInteract class partition for towns
 		}
 		col.Delete(town.id);
 	}
-	public static void updateTown(DBTown town, MCTown newtown) {
+	public static void updateTown(DBTown town, Town newtown) {
 		var col = Database.Instance.GetCollection<DBTown>("towns");
 		if (col.FindById(town.id) == null) {
 			Console.WriteLine("[RESPUBLICA] Tried to modify non-existent town!");
@@ -74,7 +75,7 @@ public static partial class DBInteract { // DBInteract class partition for towns
 		}
 
 		var dbt = new DBTown();
-		foreach (var prop in typeof(MCTown).GetProperties())
+		foreach (var prop in typeof(Town).GetProperties())
 		{
 			if (prop.CanWrite) prop.SetValue(dbt, prop.GetValue(newtown));
 		} // Convert MCTown to DBTown
