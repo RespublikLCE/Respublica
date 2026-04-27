@@ -5,8 +5,18 @@ using Commands;
 using Minecraft.Server.FourKit;
 using System.Reflection;
 
+public enum ExternalType
+{
+	SubTown, // Town Subcommand
+	SubNation, // Nation Subcommand
+	SubPlot, // Plot Subcommand
+	SubInvite, // Invite Subcommand
+	SubRespublica, // Respublica Subcommand
+	Empty // General Use Function
+}
+
 internal class ExternalFunc {
-	public string type = "subtown";
+	public ExternalType type = ExternalType.Empty;
 	public required string name;
 	public string cmd = "";
 	public required Delegate func;
@@ -16,15 +26,12 @@ public class Respublica : ServerPlugin
 {
 	private static Respublica? _instance;
 	public static Respublica? getInstance() => _instance;
-	internal static void setInstance(Respublica inst)
-	{
-		_instance = inst;
-	}
+	internal static void setInstance(Respublica inst) => _instance = inst;
 
 	internal List<ExternalFunc> extRegisterFunc = [];
 
 	public override string name => "Respublica";
-	public override string version => "1.0.0-alpha.1";
+	public override string version => Assembly.GetExecutingAssembly().GetName().Version!.ToString();
 	public override string author => "UniPM";
 
 	private const string path = @"./plugindb"; // i have it as ./ bc it executes as the server exe - uni

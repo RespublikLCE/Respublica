@@ -1,4 +1,5 @@
 using System.Reflection;
+using LiteDB;
 
 namespace Respublica;
 
@@ -13,7 +14,7 @@ public class RespublicaAPI
         return Respublica.getInstance();
     }
 
-    public static void registerExternal(string type, string name, string cmd, Delegate func)
+    public static void registerExternal(ExternalType type, string name, string cmd, Delegate func)
     {
         var exex = new ExternalFunc
         {
@@ -24,4 +25,13 @@ public class RespublicaAPI
         };
         getRespublica()?.extRegisterFunc.Add(exex);
     }
+
+    public static object? execExternal(string name, object[] args)
+    {
+        var external = getRespublica()?.extRegisterFunc.Find(x => x.name == name);
+        if (external == null) return null;
+        return external.func.DynamicInvoke(args);
+    }
+
+    public static ILiteCollection<T> GetDBCollection<T>(string name) => Database.Instance.GetCollection<T>(name);
 }

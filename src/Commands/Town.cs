@@ -27,9 +27,9 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 		if (args.Length > 0) {
 			if (string.IsNullOrEmpty(PlrInteract.guidToUsrname(((Player)sender).getUniqueId()))) return true;
 
-			if ((Respublica.getInstance()?.extRegisterFunc ?? []).Any(x => x.type == "subtown" && x.cmd == args[0]))
+			if ((Respublica.getInstance()?.extRegisterFunc ?? []).Any(x => x.type == ExternalType.SubTown && x.cmd == args[0]))
 			{
-				var getregfunc = (Respublica.getInstance()?.extRegisterFunc ?? []).Find(x => x.type == "subtown" && x.cmd == args[0]);
+				var getregfunc = (Respublica.getInstance()?.extRegisterFunc ?? []).Find(x => x.type == ExternalType.SubTown && x.cmd == args[0]);
 				if (getregfunc == null) return true;
 				getregfunc.func.DynamicInvoke(sender, command, label, args);
 				return true;
