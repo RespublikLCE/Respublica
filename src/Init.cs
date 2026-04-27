@@ -3,13 +3,13 @@ using Minecraft.Server.FourKit;
 
 namespace Respublica;
 
-internal static class Init // Function/class for initializing all the commands (for cleanliness)
+internal sealed class Init // Function/class for initializing all the commands (for cleanliness)
 {
     public static string centerSpaces(string version)
     {
         var sb = new StringBuilder();
         int vc = 0;
-        int sc = 20; // UNI - amount of spaces to the middle, magic value
+        const int sc = 20; // UNI - amount of spaces to the middle, magic value
         foreach (char c in version) vc++;
         for (var i = 0; i <= sc-vc/2; i++) sb.Append(' ');
         return sb.ToString();

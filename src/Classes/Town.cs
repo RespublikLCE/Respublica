@@ -17,7 +17,7 @@ public class DBTown : Town { // Class for DB towns
 	public LiteDB.ObjectId id { get; set; } = LiteDB.ObjectId.NewObjectId();
 }
 
-public static class TownInteract // Class for processing towns
+public static class StringManager // Class for processing strings
 {
 	public static string formatName(string name) => name.Replace("_", " ");
 	public static string RemoveSpecialCharacters(this string str) {

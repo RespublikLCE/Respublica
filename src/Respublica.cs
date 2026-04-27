@@ -17,12 +17,25 @@ public enum ExternalType
 
 internal class ExternalFunc {
 	public ExternalType type = ExternalType.Empty;
-	public required string name;
+	public string name;
 	public string cmd = "";
-	public required Delegate func;
+	public Delegate func;
+
+	public ExternalFunc(string _name, Delegate _func) {
+		name = _name;
+		func = _func;
+	}
+
+	public ExternalFunc(ExternalType _type, string _cmd, string _name, Delegate _func)
+	{
+		type = _type;
+		cmd = _cmd;
+		name = _name;
+		func = _func;
+	}
 }
 
-public class Respublica : ServerPlugin
+internal sealed class Respublica : ServerPlugin
 {
 	private static Respublica? _instance;
 	public static Respublica? getInstance() => _instance;

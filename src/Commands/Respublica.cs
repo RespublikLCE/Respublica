@@ -5,7 +5,7 @@ using Minecraft.Server.FourKit;
 using Minecraft.Server.FourKit.Command;
 using Minecraft.Server.FourKit.Entity;
 
-public class RespublicaCmd : CommandExecutor // Commands for managing invites
+internal sealed class RespublicaCmd : CommandExecutor // Commands for managing invites
 {
     public bool onCommand(CommandSender sender, Command command, string label, string[] args)
     {
@@ -13,7 +13,7 @@ public class RespublicaCmd : CommandExecutor // Commands for managing invites
 
         if (args.Length == 0)
         {
-            sender.sendMessage(["._--[Respublica]--_.",
+            sender.sendMessage([".0--[Respublica]--0.",
              $"Version: {Respublica.getInstance()?.version ?? "Unknown"}",
              "RespublikLCE/Respublica on Github!"]);
             return true;
@@ -21,7 +21,13 @@ public class RespublicaCmd : CommandExecutor // Commands for managing invites
 
         if (args.Length > 0)
         {
-            if (string.IsNullOrEmpty(PlrInteract.guidToUsrname(((Player)sender).getUniqueId()))) return true;
+            var getregfunc = (Respublica.getInstance()?.extRegisterFunc ?? []).Find(x => x.type == ExternalType.SubRespublica && x.cmd == args[0]);
+            if (getregfunc != null)
+			{
+				getregfunc.func.DynamicInvoke(sender, command, label, args);
+				return true;
+			}
+
             switch (args[0])
             {
                 case "map":
@@ -38,7 +44,7 @@ public class RespublicaCmd : CommandExecutor // Commands for managing invites
                         }
                         mapfinal.Add(ns.ToString());
                     }
-                    mapfinal.Add($"Town: {TownInteract.formatName(DBInteract.getTownById(ChunkInteract.getChunk(mapcoord.x, mapcoord.z)?.town ?? LiteDB.ObjectId.Empty)?.name ?? "None")}");
+                    mapfinal.Add($"Town: {StringManager.formatName(DBInteract.getTownById(ChunkInteract.getChunk(mapcoord.x, mapcoord.z)?.town ?? LiteDB.ObjectId.Empty)?.name ?? "None")}");
                     sender.sendMessage([.. mapfinal]);
                     break;
             }

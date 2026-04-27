@@ -94,7 +94,7 @@ internal sealed class RespublicaListener : Listener
 	public void onInteract(PlayerInteractEvent e)
 	{
 		if (e.getAction() != Minecraft.Server.FourKit.Block.Action.RIGHT_CLICK_BLOCK) return;
-		var cloc = ChunkInteract.cToCC(e.getClickedBlock().getLocation()); // UNI - don't worry abt this, its already guaranteed to be not-null
+		var cloc = ChunkInteract.cToCC(e.getClickedBlock()!.getLocation());
 		var chunk = ChunkInteract.getChunk(cloc.x, cloc.z);
 
 		if (chunk == null) return;

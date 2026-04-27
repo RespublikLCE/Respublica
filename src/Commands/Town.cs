@@ -3,7 +3,7 @@ namespace Respublica.Commands;
 using Minecraft.Server.FourKit.Command;
 using Minecraft.Server.FourKit.Entity;
 
-public class TownCmd : CommandExecutor // Commands for managing towns
+internal sealed class TownCmd : CommandExecutor // Commands for managing towns
 {
 	public bool onCommand(CommandSender sender, Command command, string label, string[] args)
 	{
@@ -17,8 +17,8 @@ public class TownCmd : CommandExecutor // Commands for managing towns
                         	sender.sendMessage("You don't have a town!");
                         	return true;
                 	}
-			sender.sendMessage($"--- {TownInteract.formatName(t.name)} ---");
-			sender.sendMessage($"Chunk count: {Database.Instance.GetCollection<DBChunk>("chunks").Count(LiteDB.Query.EQ("town", t.id))}"); // UNI - srry didn't feel like adding a function
+			sender.sendMessage($"--- {StringManager.formatName(t.name)} ---");
+			sender.sendMessage($"Townplots: {Database.Instance.GetCollection<DBChunk>("chunks").Count(LiteDB.Query.EQ("town", t.id))}"); // UNI - srry didn't feel like adding a function
 			sender.sendMessage($"Mayor: {PlrInteract.guidToUsrname(t.mayor)}");
 			sender.sendMessage($"PVP: {t.perm.PVP} EXPLOSIONS: {t.perm.EXPLOSION} FIRE: {t.perm.FIRE} MOBS: {t.perm.MOBS}");
 			return true;
@@ -27,10 +27,9 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 		if (args.Length > 0) {
 			if (string.IsNullOrEmpty(PlrInteract.guidToUsrname(((Player)sender).getUniqueId()))) return true;
 
-			if ((Respublica.getInstance()?.extRegisterFunc ?? []).Any(x => x.type == ExternalType.SubTown && x.cmd == args[0]))
+			var getregfunc = (Respublica.getInstance()?.extRegisterFunc ?? []).Find(x => x.type == ExternalType.SubTown && x.cmd == args[0]);
+            if (getregfunc != null)
 			{
-				var getregfunc = (Respublica.getInstance()?.extRegisterFunc ?? []).Find(x => x.type == ExternalType.SubTown && x.cmd == args[0]);
-				if (getregfunc == null) return true;
 				getregfunc.func.DynamicInvoke(sender, command, label, args);
 				return true;
 			}
@@ -49,7 +48,7 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 					if (nc != null) break;
 
 					DBInteract.initTown((Player)sender, args[1]);
-					sender.sendMessage($"Created town \"{TownInteract.formatName(args[1])}\"!");
+					sender.sendMessage($"Created town \"{StringManager.formatName(args[1])}\"!");
 					break;
 				case "set":
 					if (args.Length < 2) { sender.sendMessage("Invalid set command."); break; }
@@ -67,7 +66,7 @@ public class TownCmd : CommandExecutor // Commands for managing towns
 							var newname = (Town)t;
 							newname.name = args[2];
 							DBInteract.updateTown(t, newname);
-							sender.sendMessage($"Changed town name to \"{TownInteract.formatName(args[2])}\"");
+							sender.sendMessage($"Changed town name to \"{StringManager.formatName(args[2])}\"");
 							break;
 						case "mayor":
 							if (args.Length < 3) { sender.sendMessage("Invalid set command."); break; }

@@ -4,7 +4,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<BaseOutputPath>bin</BaseOutputPath>
-		<AssemblyVersion>1.0.0.1</AssemblyVersion>
+		<AssemblyVersion>0.0.0.1</AssemblyVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

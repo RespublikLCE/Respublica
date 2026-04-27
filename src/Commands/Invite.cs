@@ -3,7 +3,7 @@ namespace Respublica.Commands;
 using Minecraft.Server.FourKit.Command;
 using Minecraft.Server.FourKit.Entity;
 
-public class InvCmd : CommandExecutor // Commands for managing invites
+internal sealed class InvCmd : CommandExecutor // Commands for managing invites
 {
     public bool onCommand(CommandSender sender, Command command, string label, string[] args)
     {
@@ -19,6 +19,14 @@ public class InvCmd : CommandExecutor // Commands for managing invites
         if (args.Length > 0)
         {
             if (string.IsNullOrEmpty(PlrInteract.guidToUsrname(((Player)sender).getUniqueId()))) return true;
+
+            var getregfunc = (Respublica.getInstance()?.extRegisterFunc ?? []).Find(x => x.type == ExternalType.SubInvite && x.cmd == args[0]);
+            if (getregfunc != null)
+			{
+				getregfunc.func.DynamicInvoke(sender, command, label, args);
+				return true;
+			}
+
             switch (args[0])
             {
                 case "accept":

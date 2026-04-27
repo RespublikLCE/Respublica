@@ -3,7 +3,7 @@ namespace Respublica.Commands;
 using Minecraft.Server.FourKit.Command;
 using Minecraft.Server.FourKit.Entity;
 
-public class PlotCmd : CommandExecutor // Commands for managing invites
+internal sealed class PlotCmd : CommandExecutor // Commands for managing invites
 {
     public bool onCommand(CommandSender sender, Command command, string label, string[] args)
     {
@@ -25,7 +25,7 @@ public class PlotCmd : CommandExecutor // Commands for managing invites
         if (args.Length == 0)
         {
             sender.sendMessage($"--- Plot ({pcoord.x}, {pcoord.z}) ---");
-            sender.sendMessage(string.Format("Town: {0}", string.IsNullOrEmpty(t?.name) ? "None" : TownInteract.formatName(t.name))); // UNI - don't question the string.Format use
+            sender.sendMessage(string.Format("Town: {0}", string.IsNullOrEmpty(t?.name) ? "None" : StringManager.formatName(t.name))); // UNI - don't question the string.Format use
             sender.sendMessage(string.Format("Owner: {0}", string.IsNullOrEmpty(PlrInteract.guidToUsrname(plot.owner)) ? "None" : PlrInteract.guidToUsrname(plot.owner)));
             sender.sendMessage($"PVP: {plot.perm.PVP} EXPLOSIONS: {plot.perm.EXPLOSION} FIRE: {plot.perm.FIRE} MOBS: {plot.perm.MOBS}");
             sender.sendMessage(plot.forsale ? "Plot for sale! Do [/plot claim] to claim this plot." : "Plot not for sale.");
@@ -34,6 +34,14 @@ public class PlotCmd : CommandExecutor // Commands for managing invites
         if (args.Length > 0)
         {
             if (string.IsNullOrEmpty(PlrInteract.guidToUsrname(((Player)sender).getUniqueId()))) return true;
+
+            var getregfunc = (Respublica.getInstance()?.extRegisterFunc ?? []).Find(x => x.type == ExternalType.SubPlot && x.cmd == args[0]);
+            if (getregfunc != null)
+			{
+				getregfunc.func.DynamicInvoke(sender, command, label, args);
+				return true;
+			}
+
             switch (args[0])
             {
                 case "claim":
